@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% import "macros.html" as m %}
+{% set secao = "quartos" %}
+{% block titulo %}Quartos{% endblock %}
+
+{% block conteudo %}
+<header class="cabecalho">
+    <h1>Quartos</h1>
+    <p class="sub">Tabela room com todas as colunas. Cada linha é um tipo de quarto de um hotel, com sua diária.</p>
+</header>
+
+<form class="filtros" method="get" action="{{ url_for('listar_quartos') }}">
+    <label>Tipo de quarto
+        <select name="tipo">
+            <option value="">Todos</option>
+            {% for t in tipos %}
+            <option value="{{ t.roomtype }}"{% if t.roomtype == filtro.tipo %} selected{% endif %}>{{ t.roomtype }}</option>
+            {% endfor %}
+        </select>
+    </label>
+    <label>Hotel
+        <select name="hno">
+            <option value="0">Todos</option>
+            {% for h in hoteis %}
+            <option value="{{ h.hno }}"{% if h.hno == filtro.hno %} selected{% endif %}>{{ h.name }}</option>
+            {% endfor %}
+        </select>
+    </label>
+    <button type="submit">Filtrar</button>
+    {% if filtro.tipo or filtro.hno %}
+    <a class="limpar" href="{{ url_for('listar_quartos') }}">Limpar filtros</a>
+    {% endif %}
+</form>
+
+{% if quartos %}
+<div class="tabela-rolavel">
+    <table>
+        <thead>
+            <tr>
+                <th title="Chave estrangeira para hotel">hno</th>
+                <th>Hotel</th>
+                <th>Cidade</th>
+                <th>roomtype</th>
+                <th class="num">max_free</th>
+                <th class="num">price</th>
+                <th class="num">Reservas</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for q in quartos %}
+            <tr>
+                <td>{{ m.chave(q.hno) }}</td>
+                <td><a href="{{ url_for('detalhe_hotel', hno=q.hno) }}">{{ q.hotel }}</a></td>
+                <td>{{ q.city }}, {{ q.state }}</td>
+                <td>{{ m.tipo(q.roomtype) }}</td>
+                <td class="num">{{ q.max_free }}</td>
+                <td class="num">{{ q.price|dinheiro }}</td>
+                <td class="num">{{ q.reservas }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+<p class="rodape-tabela">Mostrando {{ quartos|length }} de {{ total }} registros.</p>
+{% else %}
+<p class="vazio">Nenhum quarto encontrado com esses filtros. <a href="{{ url_for('listar_quartos') }}">Limpar filtros</a></p>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% import "macros.html" as m %}
+{% set secao = "index" %}
+{% block titulo %}Visão geral{% endblock %}
+
+{% block conteudo %}
+<header class="cabecalho">
+    <h1>Estadias de {{ eixo.ini|data_br }} a {{ eixo.fim|data_br }}</h1>
+    <p class="sub">Cada barra vai da chegada à saída de uma reserva. Abra uma linha para ver os detalhes.</p>
+</header>
+
+{{ m.legenda() }}
+
+<div class="agenda">
+    <div class="agenda-eixo">
+        <span></span>
+        {{ m.escala(eixo) }}
+    </div>
+    {% for r in reservas %}
+    <a class="agenda-linha" href="{{ url_for('detalhe_reserva', rno=r.rno) }}">
+        <span class="agenda-quem">
+            <strong>{{ r.cliente }}</strong>
+            <span>{{ r.hotel }}, {{ r.hotel_city }}</span>
+        </span>
+        {{ m.trilho(r, eixo) }}
+    </a>
+    {% endfor %}
+</div>
+
+<section class="bloco">
+    <h1>Tabelas do banco</h1>
+    <div class="tabela-rolavel">
+        <table>
+            <thead>
+                <tr><th>Tabela</th><th>Colunas</th><th class="num">Registros</th></tr>
+            </thead>
+            <tbody>
+                {% for t in tabelas %}
+                <tr>
+                    <td><a href="{{ url_for(t.endpoint) }}">{{ t.tabela }}</a></td>
+                    <td class="quebra">{{ colunas[t.tabela]|join(", ") }}</td>
+                    <td class="num">{{ t.total }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

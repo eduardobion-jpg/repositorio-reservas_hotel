@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% import "macros.html" as m %}
+{% set secao = "hoteis" %}
+{% block titulo %}{{ hotel.name }}{% endblock %}
+
+{% block conteudo %}
+<header class="cabecalho">
+    <h1>{{ m.chave(hotel.hno) }} {{ hotel.name }}</h1>
+    <p class="sub">{{ hotel.address }}, {{ hotel.city }}, {{ hotel.state }} {{ hotel.zip }}</p>
+</header>
+
+<section class="bloco">
+    <h2>Dados do hotel</h2>
+    <dl class="ficha">
+        <dt>hno</dt><dd>{{ hotel.hno }}</dd>
+        <dt>name</dt><dd>{{ hotel.name }}</dd>
+        <dt>city</dt><dd>{{ hotel.city }}</dd>
+        <dt>state</dt><dd>{{ hotel.state }}</dd>
+        <dt>zip</dt><dd>{{ hotel.zip }}</dd>
+        <dt>address</dt><dd>{{ hotel.address }}</dd>
+    </dl>
+</section>
+
+<section class="bloco">
+    <h2>Quartos e diárias</h2>
+    <div class="tabela-rolavel">
+        <table>
+            <thead>
+                <tr><th>roomtype</th><th class="num">max_free</th><th class="num">price</th><th class="num">Reservas</th></tr>
+            </thead>
+            <tbody>
+                {% for q in quartos %}
+                <tr>
+                    <td>{{ m.tipo(q.roomtype) }}</td>
+                    <td class="num">{{ q.max_free }}</td>
+                    <td class="num">{{ q.price|dinheiro }}</td>
+                    <td class="num">{{ q.reservas }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<section class="bloco">
+    <h2>Reservas neste hotel</h2>
+    {% if reservas %}
+    <div class="tabela-rolavel">
+        <table>
+            <thead>
+                <tr>
+                    <th>rno</th><th>Cliente</th><th>roomtype</th><th>arrival</th><th>departure</th>
+                    <th class="num">Noites</th><th class="num">Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in reservas %}
+                <tr>
+                    <td><a href="{{ url_for('detalhe_reserva', rno=r.rno) }}">{{ r.rno }}</a></td>
+                    <td><a href="{{ url_for('detalhe_cliente', cno=r.cno) }}">{{ r.cliente }}</a></td>
+                    <td>{{ m.tipo(r.roomtype) }}</td>
+                    <td>{{ r.arrival|data_br }}</td>
+                    <td>{{ r.departure|data_br }}</td>
+                    <td class="num">{{ r.noites }}</td>
+                    <td class="num">{{ r.total|dinheiro }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p class="vazio">Este hotel ainda não tem reservas.</p>
+    {% endif %}
+</section>
+
+<a class="voltar" href="{{ url_for('listar_hoteis') }}">Voltar para a lista de hotéis</a>
+{% endblock %}

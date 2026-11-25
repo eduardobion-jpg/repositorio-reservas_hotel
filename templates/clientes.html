@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% set secao = "clientes" %}
+{% block titulo %}Clientes{% endblock %}
+
+{% block conteudo %}
+<header class="cabecalho">
+    <h1>Clientes</h1>
+    <p class="sub">Tabela customer com todas as colunas e o número de reservas de cada cliente.</p>
+</header>
+
+<form class="filtros" method="get" action="{{ url_for('listar_clientes') }}">
+    <label>Estado
+        <select name="estado">
+            <option value="">Todos</option>
+            {% for e in estados %}
+            <option value="{{ e.state }}"{% if e.state == filtro.estado %} selected{% endif %}>{{ e.state }}</option>
+            {% endfor %}
+        </select>
+    </label>
+    <label>Nome ou sobrenome
+        <input type="search" name="q" value="{{ filtro.q }}">
+    </label>
+    <button type="submit">Filtrar</button>
+    {% if filtro.estado or filtro.q %}
+    <a class="limpar" href="{{ url_for('listar_clientes') }}">Limpar filtros</a>
+    {% endif %}
+</form>
+
+{% if clientes %}
+<div class="tabela-rolavel">
+    <table>
+        <thead>
+            <tr>
+                <th title="Chave primária">cno</th>
+                <th>title</th>
+                <th>name</th>
+                <th>firstname</th>
+                <th>city</th>
+                <th>state</th>
+                <th>zip</th>
+                <th class="num">account</th>
+                <th class="num">Reservas</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for c in clientes %}
+            <tr>
+                <td>{{ c.cno }}</td>
+                <td>{{ c.title }}</td>
+                <td><a href="{{ url_for('detalhe_cliente', cno=c.cno) }}">{{ c.name }}</a></td>
+                <td>{{ c.firstname or '—' }}</td>
+                <td>{{ c.city }}</td>
+                <td>{{ c.state }}</td>
+                <td>{{ c.zip }}</td>
+                <td class="num{% if c.account < 0 %} negativo{% endif %}">{{ c.account|dinheiro }}</td>
+                <td class="num">{{ c.reservas }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+<p class="rodape-tabela">Mostrando {{ clientes|length }} de {{ total }} clientes.</p>
+{% else %}
+<p class="vazio">Nenhum cliente encontrado com esses filtros. <a href="{{ url_for('listar_clientes') }}">Limpar filtros</a></p>
+{% endif %}
+{% endblock %}

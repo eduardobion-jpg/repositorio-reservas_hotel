@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% import "macros.html" as m %}
+{% set secao = "clientes" %}
+{% block titulo %}{{ cliente|nome_completo }}{% endblock %}
+
+{% block conteudo %}
+<header class="cabecalho">
+    <h1>{{ cliente|nome_completo }}</h1>
+    <p class="sub">Cliente {{ cliente.cno }}, de {{ cliente.city }}, {{ cliente.state }}.</p>
+</header>
+
+<section class="bloco">
+    <h2>Dados do cliente</h2>
+    <dl class="ficha">
+        <dt>cno</dt><dd>{{ cliente.cno }}</dd>
+        <dt>title</dt><dd>{{ cliente.title }}</dd>
+        <dt>name</dt><dd>{{ cliente.name }}</dd>
+        <dt>firstname</dt><dd>{{ cliente.firstname or '—' }}</dd>
+        <dt>city</dt><dd>{{ cliente.city }}</dd>
+        <dt>state</dt><dd>{{ cliente.state }}</dd>
+        <dt>zip</dt><dd>{{ cliente.zip }}</dd>
+        <dt>account</dt>
+        <dd{% if cliente.account < 0 %} class="negativo"{% endif %}>{{ cliente.account|dinheiro }}</dd>
+    </dl>
+</section>
+
+<section class="bloco">
+    <h2>Reservas do cliente</h2>
+    {% if reservas %}
+    <div class="tabela-rolavel">
+        <table>
+            <thead>
+                <tr>
+                    <th>rno</th><th>Hotel</th><th>roomtype</th><th>arrival</th><th>departure</th>
+                    <th class="num">Noites</th><th class="num">Diária</th><th class="num">Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in reservas %}
+                <tr>
+                    <td><a href="{{ url_for('detalhe_reserva', rno=r.rno) }}">{{ r.rno }}</a></td>
+                    <td><a href="{{ url_for('detalhe_hotel', hno=r.hno) }}">{{ r.hotel }}</a>, {{ r.hotel_city }}</td>
+                    <td>{{ m.tipo(r.roomtype) }}</td>
+                    <td>{{ r.arrival|data_br }}</td>
+                    <td>{{ r.departure|data_br }}</td>
+                    <td class="num">{{ r.noites }}</td>
+                    <td class="num">{{ r.preco|dinheiro }}</td>
+                    <td class="num">{{ r.total|dinheiro }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <p class="rodape-tabela">Total das estadias: {{ reservas|sum(attribute='total')|dinheiro }}</p>
+    {% else %}
+    <p class="vazio">Este cliente ainda não tem reservas.</p>
+    {% endif %}
+</section>
+
+<a class="voltar" href="{{ url_for('listar_clientes') }}">Voltar para a lista de clientes</a>
+{% endblock %}

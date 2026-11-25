@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% import "macros.html" as m %}
+{% set secao = "reservas" %}
+{% block titulo %}Reservas{% endblock %}
+
+{% block conteudo %}
+<header class="cabecalho">
+    <h1>Reservas</h1>
+    <p class="sub">Tabela reservation com todas as colunas. Nome do cliente, nome do hotel, noites e total vêm das tabelas relacionadas.</p>
+</header>
+
+<form class="filtros" method="get" action="{{ url_for('listar_reservas') }}">
+    <label>Tipo de quarto
+        <select name="tipo">
+            <option value="">Todos</option>
+            {% for t in tipos %}
+            <option value="{{ t.roomtype }}"{% if t.roomtype == filtro.tipo %} selected{% endif %}>{{ t.roomtype }}</option>
+            {% endfor %}
+        </select>
+    </label>
+    <label>Hotel
+        <select name="hno">
+            <option value="0">Todos</option>
+            {% for h in hoteis %}
+            <option value="{{ h.hno }}"{% if h.hno == filtro.hno %} selected{% endif %}>{{ h.name }}</option>
+            {% endfor %}
+        </select>
+    </label>
+    <button type="submit">Filtrar</button>
+    {% if filtro.tipo or filtro.hno %}
+    <a class="limpar" href="{{ url_for('listar_reservas') }}">Limpar filtros</a>
+    {% endif %}
+</form>
+
+{% if reservas %}
+<div class="tabela-rolavel">
+    <table>
+        <thead>
+            <tr>
+                <th title="Chave primária">rno</th>
+                <th title="Chave estrangeira para customer">cno</th>
+                <th>Cliente</th>
+                <th title="Chave estrangeira para hotel">hno</th>
+                <th>Hotel</th>
+                <th>roomtype</th>
+                <th>arrival</th>
+                <th>departure</th>
+                <th class="num">Noites</th>
+                <th class="num">Diária</th>
+                <th class="num">Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for r in reservas %}
+            <tr>
+                <td><a href="{{ url_for('detalhe_reserva', rno=r.rno) }}">{{ r.rno }}</a></td>
+                <td>{{ r.cno }}</td>
+                <td><a href="{{ url_for('detalhe_cliente', cno=r.cno) }}">{{ r.cliente }}</a></td>
+                <td>{{ m.chave(r.hno) }}</td>
+                <td><a href="{{ url_for('detalhe_hotel', hno=r.hno) }}">{{ r.hotel }}</a></td>
+                <td>{{ m.tipo(r.roomtype) }}</td>
+                <td>{{ r.arrival|data_br }}</td>
+                <td>{{ r.departure|data_br }}</td>
+                <td class="num">{{ r.noites }}</td>
+                <td class="num">{{ r.preco|dinheiro }}</td>
+                <td class="num">{{ r.total|dinheiro }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+<p class="rodape-tabela">
+    Mostrando {{ reservas|length }} de {{ total }} reservas. Total das estadias listadas: {{ reservas|sum(attribute='total')|dinheiro }}.
+</p>
+{% else %}
+<p class="vazio">Nenhuma reserva encontrada com esses filtros. <a href="{{ url_for('listar_reservas') }}">Limpar filtros</a></p>
+{% endif %}
+{% endblock %}

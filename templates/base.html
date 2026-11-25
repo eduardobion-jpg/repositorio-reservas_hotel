@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block titulo %}Reservas{% endblock %} | Registro de reservas</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="app">
+    <aside class="lateral">
+        <a class="marca" href="{{ url_for('index') }}">
+            <span class="marca-chave" aria-hidden="true"></span>
+            <span>Registro<br>de reservas</span>
+        </a>
+        <nav aria-label="Seções">
+            <a href="{{ url_for('index') }}"{% if secao == 'index' %} class="ativo" aria-current="page"{% endif %}>Visão geral</a>
+            {% for t in tabelas %}
+            <a href="{{ url_for(t.endpoint) }}"{% if secao == t.secao %} class="ativo" aria-current="page"{% endif %}>
+                <span>{{ t.rotulo }}</span>
+                <span class="contagem">{{ t.total }}</span>
+            </a>
+            {% endfor %}
+        </nav>
+    </aside>
+
+    <main class="principal">
+        {% block conteudo %}{% endblock %}
+    </main>
+</div>
+</body>
+</html>

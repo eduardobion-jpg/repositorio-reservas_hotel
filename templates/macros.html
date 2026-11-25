@@ -1,0 +1,40 @@
+{# Componentes reutilizados. Uso:  {% import "macros.html" as m %}  ...  {{ m.chave(h.hno) }} #}
+
+{# Numero do hotel, desenhado como a plaquinha de uma chave de quarto #}
+{% macro chave(hno) -%}
+<span class="chave" title="Número do hotel (hno)">{{ hno }}</span>
+{%- endmacro %}
+
+{# Tipo de quarto com o marcador de cor (single, double ou suite) #}
+{% macro tipo(roomtype) -%}
+<span class="etiqueta" data-tipo="{{ roomtype }}">{{ roomtype }}</span>
+{%- endmacro %}
+
+{# Legenda das cores usadas nas barras e etiquetas #}
+{% macro legenda() -%}
+<p class="legenda">
+    {{ tipo('single') }}
+    {{ tipo('double') }}
+    {{ tipo('suite') }}
+</p>
+{%- endmacro %}
+
+{# Nomes dos meses sobre o eixo; janeiro mostra o ano #}
+{% macro escala(eixo) -%}
+<div class="escala" aria-hidden="true">
+    {% for mk in eixo.marcas %}
+    <span{% if mk.ano %} class="ano"{% endif %} style="left: {{ mk.pos }}%">{{ mk.rotulo }}</span>
+    {% endfor %}
+</div>
+{%- endmacro %}
+
+{# Barra de uma reserva sobre o eixo comum: do dia da chegada ao dia da saida #}
+{% macro trilho(r, eixo) -%}
+<div class="trilho" role="img"
+     aria-label="De {{ r.arrival|data_br }} a {{ r.departure|data_br }}, {{ r.noites }} {{ 'noite' if r.noites == 1 else 'noites' }}">
+    {% for mk in eixo.marcas %}
+    <span class="divisoria{% if mk.ano %} ano{% endif %}" style="left: {{ mk.pos }}%"></span>
+    {% endfor %}
+    <span class="barra" data-tipo="{{ r.roomtype }}" style="left: {{ r.esq }}%; width: {{ r.larg }}%"></span>
+</div>
+{%- endmacro %}

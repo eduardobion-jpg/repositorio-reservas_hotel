@@ -1,0 +1,402 @@
+/* ==========================================================================
+   Registro de reservas - style.css
+
+   Ideia visual: o painel de recepção de um hotel. A lateral verde-garrafa lembra
+   o uniforme do mensageiro; o latão aparece só onde algo é identificador de
+   hotel (a plaquinha da chave). O destaque da interface é a linha do tempo das
+   estadias, em que cada reserva é uma barra do dia de chegada ao dia de saída.
+
+   Organização:
+   1. Variáveis (cores e fontes)   2. Base   3. Estrutura da página
+   4. Menu lateral                 5. Formulários de filtro
+   6. Tabelas                      7. Componentes (chave, etiqueta)
+   8. Linha do tempo               9. Fichas de detalhe
+   10. Responsivo e acessibilidade
+   ========================================================================== */
+
+/* 1. Variáveis ------------------------------------------------------------ */
+:root {
+    color-scheme: light dark;
+
+    --papel: #f1f3f5;
+    --superficie: #ffffff;
+    --realce: #f5f7f8;
+    --tinta: #1b2530;
+    --suave: #56636f;
+    --linha: #d6dce1;
+
+    --lateral: #12403a;
+    --lateral-ativo: #0a2b27;
+    --lateral-texto: #d4e5e1;
+    --lateral-suave: #9dbcb5;
+
+    --acao: #12403a;
+    --acao-texto: #ffffff;
+    --link: #0e5a4e;
+    --latao: #8a6212;
+    --latao-claro: #d9b45c;
+    --perigo: #a3392b;
+
+    --single: #2f66a3;
+    --double: #1f7f70;
+    --suite: #84449a;
+
+    --raio: 4px;
+    --fonte: "Segoe UI", system-ui, -apple-system, Roboto, "Helvetica Neue", Arial, sans-serif;
+    --fonte-titulo: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --papel: #0f1519;
+        --superficie: #171f25;
+        --realce: #1d272e;
+        --tinta: #e5eaee;
+        --suave: #99a6b1;
+        --linha: #2a3640;
+
+        --lateral: #0b2622;
+        --lateral-ativo: #061816;
+        --lateral-texto: #c4d9d4;
+        --lateral-suave: #86a8a1;
+
+        --acao: #2c7f73;
+        --link: #62d0bb;
+        --latao: #e2b659;
+        --perigo: #ef8272;
+
+        --single: #6ea6e0;
+        --double: #4cc2ae;
+        --suite: #c28ed6;
+    }
+}
+
+/* 2. Base ----------------------------------------------------------------- */
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    background: var(--papel);
+    color: var(--tinta);
+    font-family: var(--fonte);
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+h1, h2 {
+    margin: 0;
+    font-family: var(--fonte-titulo);
+    font-weight: 600;
+    line-height: 1.2;
+}
+h1 { font-size: 1.85rem; }
+h2 { font-size: 1.15rem; }
+
+a { color: var(--link); text-decoration-thickness: 1px; text-underline-offset: 0.18em; }
+a:hover { text-decoration-thickness: 2px; }
+
+:focus-visible { outline: 2px solid var(--latao); outline-offset: 2px; }
+
+/* 3. Estrutura da página -------------------------------------------------- */
+.app {
+    display: grid;
+    grid-template-columns: 14rem minmax(0, 1fr);
+    min-height: 100vh;
+}
+
+.principal {
+    max-width: 88rem;
+    padding: 2rem clamp(1rem, 2.5vw, 2rem) 3rem;
+}
+
+.cabecalho { margin-bottom: 1.5rem; }
+.sub { margin: 0.4rem 0 0; max-width: 62ch; color: var(--suave); }
+
+.bloco {
+    margin-top: 1.75rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--linha);
+}
+.bloco h2 { margin-bottom: 0.75rem; }
+
+.voltar { display: inline-block; margin-top: 1.75rem; }
+.vazio { padding: 2rem 1rem; color: var(--suave); }
+
+/* 4. Menu lateral --------------------------------------------------------- */
+.lateral {
+    position: sticky;
+    top: 0;
+    align-self: start;
+    display: flex;
+    flex-direction: column;
+    gap: 1.75rem;
+    height: 100vh;
+    padding: 1.5rem 1rem;
+    background: var(--lateral);
+    color: var(--lateral-texto);
+}
+
+.marca {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: #ffffff;
+    font-family: var(--fonte-titulo);
+    font-size: 1.15rem;
+    line-height: 1.2;
+    text-decoration: none;
+}
+
+/* plaquinha de chave de quarto: círculo com um furo no alto */
+.marca-chave {
+    position: relative;
+    flex: none;
+    width: 2rem;
+    height: 2rem;
+    border: 2px solid var(--latao-claro);
+    border-radius: 50%;
+}
+.marca-chave::after {
+    content: "";
+    position: absolute;
+    top: 0.25rem;
+    left: 50%;
+    width: 0.4rem;
+    height: 0.4rem;
+    border: 2px solid var(--latao-claro);
+    border-radius: 50%;
+    transform: translateX(-50%);
+}
+
+.lateral nav { display: flex; flex-direction: column; gap: 0.15rem; }
+.lateral nav a {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: var(--raio);
+    color: var(--lateral-texto);
+    text-decoration: none;
+    transition: background-color 0.12s;
+}
+.lateral nav a:hover { background: rgba(255, 255, 255, 0.08); }
+.lateral nav a.ativo {
+    background: var(--lateral-ativo);
+    color: #ffffff;
+    box-shadow: inset 3px 0 0 var(--latao-claro);
+}
+.contagem { color: var(--lateral-suave); font-size: 0.85rem; font-variant-numeric: tabular-nums; }
+
+/* 5. Formulários de filtro ------------------------------------------------ */
+.filtros {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    gap: 0.75rem 1rem;
+    margin-bottom: 1rem;
+}
+.filtros label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    color: var(--suave);
+    font-size: 0.82rem;
+}
+.filtros select,
+.filtros input {
+    min-width: 11rem;
+    padding: 0.4rem 0.6rem;
+    border: 1px solid var(--linha);
+    border-radius: var(--raio);
+    background: var(--superficie);
+    color: var(--tinta);
+    font: inherit;
+}
+.filtros button {
+    padding: 0.5rem 1.1rem;
+    border: 0;
+    border-radius: var(--raio);
+    background: var(--acao);
+    color: var(--acao-texto);
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    transition: filter 0.12s;
+}
+.filtros button:hover { filter: brightness(1.15); }
+.limpar { padding-bottom: 0.45rem; }
+
+/* 6. Tabelas -------------------------------------------------------------- */
+.tabela-rolavel {
+    overflow-x: auto;
+    border: 1px solid var(--linha);
+    border-radius: var(--raio);
+    background: var(--superficie);
+}
+
+table { width: 100%; border-collapse: collapse; }
+
+th, td {
+    padding: 0.5rem 0.6rem;
+    border-bottom: 1px solid var(--linha);
+    text-align: left;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+}
+th {
+    background: var(--realce);
+    color: var(--suave);
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+tbody tr:last-child td { border-bottom: 0; }
+tbody tr:hover { background: var(--realce); }
+
+th.num, td.num { text-align: right; }
+td.quebra { white-space: normal; }
+.negativo { color: var(--perigo); }
+
+.rodape-tabela { margin: 0.6rem 0 0; color: var(--suave); font-size: 0.85rem; }
+
+/* 7. Componentes ---------------------------------------------------------- */
+
+/* número do hotel, como a plaquinha de uma chave */
+.chave {
+    display: inline-block;
+    min-width: 2.3em;
+    padding: 0.05em 0.6em;
+    border: 1.5px solid var(--latao);
+    border-radius: 999px;
+    color: var(--latao);
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+}
+.cabecalho .chave { margin-right: 0.5rem; vertical-align: middle; }
+
+/* a cor do tipo de quarto vem do atributo data-tipo (barras e etiquetas) */
+[data-tipo="single"] { --cor: var(--single); }
+[data-tipo="double"] { --cor: var(--double); }
+[data-tipo="suite"]  { --cor: var(--suite); }
+
+.etiqueta { display: inline-flex; align-items: center; gap: 0.45rem; }
+.etiqueta::before {
+    content: "";
+    width: 0.65rem;
+    height: 0.65rem;
+    border-radius: 2px;
+    background: var(--cor, var(--suave));
+}
+
+.legenda { display: flex; flex-wrap: wrap; gap: 1.25rem; margin: 0 0 0.75rem; color: var(--suave); font-size: 0.85rem; }
+
+/* 8. Linha do tempo ------------------------------------------------------- */
+.agenda {
+    border: 1px solid var(--linha);
+    border-radius: var(--raio);
+    background: var(--superficie);
+}
+
+.agenda-eixo,
+.agenda-linha {
+    display: grid;
+    grid-template-columns: minmax(11rem, 22rem) minmax(0, 1fr);
+    align-items: center;
+    gap: 1.25rem;
+    padding: 0.6rem 1rem;
+}
+.agenda-eixo { padding-bottom: 0.4rem; }
+
+.agenda-linha {
+    border-top: 1px solid var(--linha);
+    color: inherit;
+    text-decoration: none;
+}
+.agenda-linha:hover { background: var(--realce); }
+.agenda-linha:focus-visible { outline-offset: -2px; }
+
+.agenda-quem { display: flex; flex-direction: column; min-width: 0; }
+.agenda-quem span { overflow: hidden; color: var(--suave); font-size: 0.85rem; text-overflow: ellipsis; white-space: nowrap; }
+
+/* nomes dos meses acima das barras */
+.escala { position: relative; height: 1.1rem; color: var(--suave); font-size: 0.72rem; }
+.escala span { position: absolute; top: 0; padding-left: 3px; line-height: 1.1rem; }
+.escala .ano { color: var(--tinta); font-weight: 700; }
+
+/* uma reserva: linha pontilhada de fundo, divisórias de mês e a barra */
+.trilho { position: relative; height: 1.1rem; }
+.trilho::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    right: 0;
+    left: 0;
+    border-top: 1px dashed var(--linha);
+}
+.divisoria { position: absolute; top: 0; bottom: 0; border-left: 1px solid var(--linha); }
+.divisoria.ano { border-left-color: var(--suave); }
+.barra {
+    position: absolute;
+    top: 0.2rem;
+    bottom: 0.2rem;
+    border-radius: 3px;
+    background: var(--cor, var(--suave));
+}
+
+/* 9. Fichas de detalhe ---------------------------------------------------- */
+.fichas {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+    gap: 0 3rem;
+}
+
+.ficha {
+    display: grid;
+    grid-template-columns: max-content minmax(0, 1fr);
+    gap: 0.4rem 1.5rem;
+    margin: 0;
+}
+.ficha dt { color: var(--suave); }
+.ficha dd { margin: 0; }
+
+.total-destaque {
+    margin: 0;
+    font-family: var(--fonte-titulo);
+    font-size: 2.4rem;
+    font-weight: 600;
+    line-height: 1.1;
+}
+.total-detalhe { margin: 0.25rem 0 0; color: var(--suave); }
+
+/* 10. Responsivo e acessibilidade ----------------------------------------- */
+@media (max-width: 52rem) {
+    .app { grid-template-columns: minmax(0, 1fr); }
+
+    .lateral {
+        position: static;
+        flex-direction: row;
+        align-items: center;
+        gap: 1rem;
+        height: auto;
+        padding: 0.75rem 1rem;
+        overflow-x: auto;
+    }
+    .lateral nav { flex-direction: row; }
+    .lateral nav a { gap: 0.5rem; white-space: nowrap; }
+    .marca { white-space: nowrap; }
+
+    .agenda-eixo,
+    .agenda-linha { grid-template-columns: minmax(0, 1fr); gap: 0.4rem; }
+    .agenda-eixo > :first-child { display: none; }
+    /* faixa estreita: mostra um mês sim, outro não (o ano em janeiro fica sempre) */
+    .escala span:nth-child(even):not(.ano) { display: none; }
+
+    h1 { font-size: 1.5rem; }
+    .total-destaque { font-size: 2rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; }
+}

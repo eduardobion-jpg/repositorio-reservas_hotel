@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% import "macros.html" as m %}
+{% set secao = "hoteis" %}
+{% block titulo %}Hotéis{% endblock %}
+
+{% block conteudo %}
+<header class="cabecalho">
+    <h1>Hotéis</h1>
+    <p class="sub">Tabela hotel com todas as colunas e o número de reservas de cada hotel.</p>
+</header>
+
+<form class="filtros" method="get" action="{{ url_for('listar_hoteis') }}">
+    <label>Estado
+        <select name="estado">
+            <option value="">Todos</option>
+            {% for e in estados %}
+            <option value="{{ e.state }}"{% if e.state == filtro.estado %} selected{% endif %}>{{ e.state }}</option>
+            {% endfor %}
+        </select>
+    </label>
+    <label>Nome ou cidade
+        <input type="search" name="q" value="{{ filtro.q }}">
+    </label>
+    <button type="submit">Filtrar</button>
+    {% if filtro.estado or filtro.q %}
+    <a class="limpar" href="{{ url_for('listar_hoteis') }}">Limpar filtros</a>
+    {% endif %}
+</form>
+
+{% if hoteis %}
+<div class="tabela-rolavel">
+    <table>
+        <thead>
+            <tr>
+                <th title="Chave primária">hno</th>
+                <th>name</th>
+                <th>city</th>
+                <th>state</th>
+                <th>zip</th>
+                <th>address</th>
+                <th class="num">Reservas</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for h in hoteis %}
+            <tr>
+                <td>{{ m.chave(h.hno) }}</td>
+                <td><a href="{{ url_for('detalhe_hotel', hno=h.hno) }}">{{ h.name }}</a></td>
+                <td>{{ h.city }}</td>
+                <td>{{ h.state }}</td>
+                <td>{{ h.zip }}</td>
+                <td>{{ h.address }}</td>
+                <td class="num">{{ h.reservas }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+<p class="rodape-tabela">Mostrando {{ hoteis|length }} de {{ total }} hotéis.</p>
+{% else %}
+<p class="vazio">Nenhum hotel encontrado com esses filtros. <a href="{{ url_for('listar_hoteis') }}">Limpar filtros</a></p>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% import "macros.html" as m %}
+{% set secao = "reservas" %}
+{% block titulo %}Reserva {{ r.rno }}{% endblock %}
+
+{% block conteudo %}
+<header class="cabecalho">
+    <h1>Reserva {{ r.rno }}</h1>
+    <p class="sub">{{ r.cliente }} em {{ r.hotel }}, de {{ r.arrival|data_br }} a {{ r.departure|data_br }}.</p>
+</header>
+
+<p class="total-destaque">{{ r.total|dinheiro }}</p>
+<p class="total-detalhe">{{ r.noites }} {{ 'noite' if r.noites == 1 else 'noites' }} a {{ r.preco|dinheiro }} por noite</p>
+
+<div class="fichas">
+    <section class="bloco">
+        <h1>Estadia</h1>
+        <dl class="ficha">
+            <dt>rno</dt><dd>{{ r.rno }}</dd>
+            <dt>roomtype</dt><dd>{{ m.tipo(r.roomtype) }}</dd>
+            <dt>arrival</dt><dd>{{ r.arrival|data_br }}</dd>
+            <dt>departure</dt><dd>{{ r.departure|data_br }}</dd>
+        </dl>
+    </section>
+
+    <section class="bloco">
+        <h1>Hóspede</h1>
+        <dl class="ficha">
+            <dt>cno</dt><dd><a href="{{ url_for('detalhe_cliente', cno=r.cno) }}">{{ r.cno }}</a></dd>
+            <dt>Nome</dt><dd>{{ r.cliente }}</dd>
+            <dt>city</dt><dd>{{ cliente.city }}, {{ cliente.state }}</dd>
+            <dt>account</dt>
+            <dd {% if cliente.account < 0 %} class="negativo"{% endif %}>{{ cliente.account|dinheiro }}</dd>
+        </dl>
+    </section>
+
+    <section class="bloco">
+        <h1>Hotel</h1>
+        <dl class="ficha">
+            <dt>hno</dt><dd>{{ m.chave(r.hno) }}</dd>
+            <dt>name</dt><dd><a href="{{ url_for('detalhe_hotel', hno=r.hno) }}">{{ r.hotel }}</a></dd>
+            <dt>address</dt><dd>{{ r.hotel_address }}</dd>
+            <dt>city</dt><dd>{{ r.hotel_city }}, {{ r.hotel_state }}</dd>
+        </dl>
+    </section>
+</div>
+
+<a class="voltar" href="{{ url_for('listar_reservas') }}">Voltar para a lista de reservas</a>
+{% endblock %}
